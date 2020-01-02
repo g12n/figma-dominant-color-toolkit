@@ -112,6 +112,14 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
       swatch.resize(swatchSize, swatchSize);
       swatch.fills = [{ type: "SOLID", color: color }];
       swatches.appendChild(swatch);
+
+    // hacky way to determine if the swatch is white
+    const { r, g, b } = color
+    if (r === 1 && g === 1 && b === 1) {
+      swatches.strokeAlign = "INSIDE";
+      swatches.strokes = [{ type: "SOLID", color: black, opacity: 0.08 }];
+    }
+
     });
     return line;
   };

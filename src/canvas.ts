@@ -41,7 +41,7 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   frame.clipsContent = true
   frame.cornerRadius = paletteCornerRadius;
   frame.layoutMode ="VERTICAL";
-  frame.itemSpacing=8;
+  frame.itemSpacing=16;
   frame.counterAxisSizingMode="AUTO";
 
   const imageBackground = figma.createFrame();
@@ -75,9 +75,6 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   colors.name = "Colors"
   colors.layoutMode ="VERTICAL";
   colors.counterAxisSizingMode="AUTO"
-  colors.verticalPadding = 16;
-  colors.horizontalPadding = 16;
-  colors.itemSpacing = 24;
   frame.appendChild(colors)
 
   const createSwatches = (
@@ -88,7 +85,8 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     line.name = label;
     line.layoutMode = "VERTICAL";
     line.counterAxisSizingMode = "AUTO";
-    line.itemSpacing = 8;
+    line.horizontalPadding = 16;
+    line.verticalPadding = 8;
 
     const labelText = figma.createText();
     labelText.name = "Label";
@@ -102,6 +100,7 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     swatches.name = `Swatches`;
     swatches.layoutMode = "HORIZONTAL";
     swatches.counterAxisSizingMode="AUTO";
+    swatches.verticalPadding = 8;
     swatches.itemSpacing = swatchGap;
     line.appendChild(swatches);
 

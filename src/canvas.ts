@@ -35,18 +35,11 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   frame.resize(maxWidth, totalHeight)
   frame.x = node.x + node.width + 100
   frame.y = node.y
-  frame.backgrounds = []
-  frame.effects = []
+  frame.fills = [{ color: white, type: "SOLID" }];
+  frame.effects = [{ type: 'DROP_SHADOW', visible: true, blendMode: "NORMAL", radius: 12, offset: { x: 0, y: 2 }, color: { ...black, a: 0.16 }}]
   frame.name = "Palette"
-  frame.clipsContent = false
-  const background = figma.createRectangle()
-  frame.appendChild(background)
-  background.x = 0
-  background.y = 0
-  background.resize(maxWidth, totalHeight)
-  background.cornerRadius = paletteCornerRadius
-  background.fills = [{ color: white, type: 'SOLID' }]
-  background.effects = [{ type: 'DROP_SHADOW', visible: true, blendMode: "NORMAL", radius: 12, offset: { x: 0, y: 2 }, color: { ...black, a: 0.16 }}]
+  frame.clipsContent = true
+  frame.cornerRadius = paletteCornerRadius;
 
   const imageBackground = figma.createRectangle()
   imageBackground.y = 0

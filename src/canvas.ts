@@ -41,19 +41,16 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   frame.clipsContent = true
   frame.cornerRadius = paletteCornerRadius;
 
-  const imageBackground = figma.createRectangle()
+  const imageBackground = figma.createFrame();
+  frame.appendChild(imageBackground);
   imageBackground.y = 0
-  imageBackground.topLeftRadius = paletteCornerRadius
-  imageBackground.topRightRadius = paletteCornerRadius
   imageBackground.resize(maxWidth, imageBoundsHeight)
   imageBackground.fills = [{ type: 'SOLID', color: dominantColor, opacity: 0.08 }]
   imageBackground.effects = [{ type: 'INNER_SHADOW', visible: true, blendMode: "NORMAL", radius: 0, offset: { x: 0, y: -1 }, color: { ...black, a: 0.08 }}]
-
+  
   const imageBounds = figma.createRectangle()
   imageBounds.name = "Source image"
-
-  frame.appendChild(imageBackground)
-  frame.appendChild(imageBounds)
+  imageBackground.appendChild(imageBounds);
 
   const paint = getFirstImagePaintFromNode(node)
   imageBounds.fills = [ paint]

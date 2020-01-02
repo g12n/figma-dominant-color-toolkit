@@ -40,14 +40,19 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   frame.name = "Palette"
   frame.clipsContent = true
   frame.cornerRadius = paletteCornerRadius;
+  frame.layoutMode ="VERTICAL";
+  frame.counterAxisSizingMode="AUTO";
+  frame.itemSpacing = 0;
 
   const imageBackground = figma.createFrame();
+  imageBackground.name="Image"
+
   frame.appendChild(imageBackground);
   imageBackground.y = 0
   imageBackground.resize(maxWidth, imageBoundsHeight)
   imageBackground.fills = [{ type: 'SOLID', color: dominantColor, opacity: 0.08 }]
   imageBackground.effects = [{ type: 'INNER_SHADOW', visible: true, blendMode: "NORMAL", radius: 0, offset: { x: 0, y: -1 }, color: { ...black, a: 0.08 }}]
-  
+
   const imageBounds = figma.createRectangle()
   imageBounds.name = "Source image"
   imageBackground.appendChild(imageBounds);
@@ -65,68 +70,49 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     ? 0
     : (maxWidth - node.width) / 2
   
+  const createSwatches = (
+    label: string = "Swatches",
+    colors: Array<{ r: number; g: number; b: number }>
+  ) => {
+    const line = figma.createFrame();
+    line.name = label;
+    line.layoutMode = "VERTICAL";
+    line.counterAxisSizingMode = "AUTO";
+    line.itemSpacing = 8;
+    line.verticalPadding = 12;
+    line.horizontalPadding = 16;
 
-  const label = figma.createText()
-  label.name = "Label"
-  label.fontName = hasSf ? sf : roboto
-  label.fills = [{ type: 'SOLID', color: black }]
-  label.fontSize = 10
-  
-  const dominantLabel = label
-  dominantLabel.characters = "DOMINANT COLOR"
-  dominantLabel.y = contentStartY
-  dominantLabel.x = leftMargin
-  
-  const recommendedTextLabel = dominantLabel.clone()
-  recommendedTextLabel.characters = "RECOMMENDED TEXT COLOR"
-  recommendedTextLabel.y = dominantLabel.y + labelBottomMargin + swatchSize + labelTopMargin
+    const labelText = figma.createText();
+    labelText.name = "Label";
+    labelText.fontName = hasSf ? sf : roboto;
+    labelText.fills = [{ type: "SOLID", color: black }];
+    labelText.fontSize = 10;
+    labelText.characters = label;
+    line.appendChild(labelText);
 
-  const paletteLabel = recommendedTextLabel.clone()
-  paletteLabel.characters = "PALETTE"
-  paletteLabel.y = recommendedTextLabel.y + labelBottomMargin + swatchSize + labelTopMargin
+    const swatches = figma.createFrame();
+    swatches.name = `Swatches`;
+    swatches.layoutMode = "HORIZONTAL";
+    swatches.counterAxisSizingMode="AUTO";
+    swatches.itemSpacing = swatchGap;
+    line.appendChild(swatches);
 
-  frame.appendChild(dominantLabel)
-  frame.appendChild(recommendedTextLabel)
-  frame.appendChild(paletteLabel)
+    colors.map(color => {
+      const swatch = figma.createRectangle();
+      swatch.name = "Swatch";
+      swatch.cornerRadius = 2;
+      swatch.resize(swatchSize, swatchSize);
+      swatch.fills = [{ type: "SOLID", color: color }];
+      swatches.appendChild(swatch);
+    });
+    return line;
+  };
 
-  const swatch = figma.createRectangle()
-  swatch.name = "Swatch"
-  swatch.cornerRadius = 2
-  swatch.resize(swatchSize, swatchSize)
-  swatch.x = leftMargin
-  swatch.y = dominantLabel.y + labelBottomMargin
-  const dominantSwatch = swatch
-  dominantSwatch.fills = [{ type: 'SOLID', color: dominantColor }]
-  frame.appendChild(dominantSwatch)
-
-  for (let [index, color] of suggestedTextColors.entries()) {
-    let paletteSwatch = dominantSwatch.clone()
-    paletteSwatch.x = leftMargin + (index * (swatchSize + swatchGap))
-    paletteSwatch.y = recommendedTextLabel.y + labelBottomMargin
-    paletteSwatch.fills = [{ type: 'SOLID', color }]
-    // hacky way to determine if the swatch is white
-    const { r, g, b } = color
-    if (r === 1 && g === 1 && b === 1) {
-      paletteSwatch.strokeAlign = "INSIDE"
-      paletteSwatch.strokes = [{ type: 'SOLID', color: black, opacity: 0.08 }]
-    }
-    frame.appendChild(paletteSwatch)
-  }
-  
-  
-  for (let [index, color] of palette.entries()) {
-    let paletteSwatch = dominantSwatch.clone()
-    paletteSwatch.x = leftMargin + (index * (swatchSize + swatchGap))
-    paletteSwatch.y = paletteLabel.y + labelBottomMargin
-    paletteSwatch.fills = [{ type: 'SOLID', color }]
-    // hacky way to determine if the swatch is white
-    const { r, g, b } = color
-    if (r === 1 && g === 1 && b === 1) {
-      paletteSwatch.strokeAlign = "INSIDE"
-      paletteSwatch.strokes = [{ type: 'SOLID', color: black, opacity: 0.08 }]
-    }
-    frame.appendChild(paletteSwatch)
-  }
+  frame.appendChild(createSwatches("DOMINANT COLOR", [dominantColor]));
+  frame.appendChild(
+    createSwatches("RECOMMENDED TEXT COLOR", suggestedTextColors)
+  );
+  frame.appendChild(createSwatches("PALETTE", palette));
 
   return Promise.resolve(frame)
 }

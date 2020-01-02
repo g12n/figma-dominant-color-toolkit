@@ -41,8 +41,8 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
   frame.clipsContent = true
   frame.cornerRadius = paletteCornerRadius;
   frame.layoutMode ="VERTICAL";
+  frame.itemSpacing=8;
   frame.counterAxisSizingMode="AUTO";
-  frame.itemSpacing = 0;
 
   const imageBackground = figma.createFrame();
   imageBackground.name="Image"
@@ -70,6 +70,16 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     ? 0
     : (maxWidth - node.width) / 2
   
+
+  const colors = figma.createFrame()
+  colors.name = "Colors"
+  colors.layoutMode ="VERTICAL";
+  colors.counterAxisSizingMode="AUTO"
+  colors.verticalPadding = 16;
+  colors.horizontalPadding = 16;
+  colors.itemSpacing = 24;
+  frame.appendChild(colors)
+
   const createSwatches = (
     label: string = "Swatches",
     colors: Array<{ r: number; g: number; b: number }>
@@ -79,8 +89,6 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     line.layoutMode = "VERTICAL";
     line.counterAxisSizingMode = "AUTO";
     line.itemSpacing = 8;
-    line.verticalPadding = 12;
-    line.horizontalPadding = 16;
 
     const labelText = figma.createText();
     labelText.name = "Label";
@@ -108,11 +116,11 @@ export async function generateColorGuideFrame(node, data: UIColorData): Promise<
     return line;
   };
 
-  frame.appendChild(createSwatches("DOMINANT COLOR", [dominantColor]));
-  frame.appendChild(
+  colors.appendChild(createSwatches("DOMINANT COLOR", [dominantColor]));
+  colors.appendChild(
     createSwatches("RECOMMENDED TEXT COLOR", suggestedTextColors)
   );
-  frame.appendChild(createSwatches("PALETTE", palette));
+  colors.appendChild(createSwatches("PALETTE", palette));
 
   return Promise.resolve(frame)
 }
